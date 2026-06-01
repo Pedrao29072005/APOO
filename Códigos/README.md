@@ -14,3 +14,4 @@ Este é o esqueleto base para o projeto da disciplina de Análise e Projeto Orie
 2. Abra o arquivo 'src/br/com/unicesumar/Main.java'.
 3. Clique em 'Run'.
 Fazendo teste
+AAAAAAAAAAAAAAA
