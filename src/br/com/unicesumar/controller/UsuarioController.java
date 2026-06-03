@@ -2,6 +2,8 @@ package br.com.unicesumar.controller;
 
 import br.com.unicesumar.model.Usuario;
 import br.com.unicesumar.model.UsuarioPadrao;
+import br.com.unicesumar.model.Administrador;
+import br.com.unicesumar.model.Funcionario;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -149,5 +151,70 @@ public class UsuarioController {
     // Verificar se há usuário logado
     public Usuario getUsuarioLogado() {
         return usuarioLogado;
+    }
+    
+    // CREATE - Registrar usuário com tipo específico
+    public boolean registrarUsuarioComTipo(String nome, String login, String email, String senha, String tipo) {
+        if (login == null || login.trim().isEmpty()) {
+            System.out.println("Erro: Login não pode estar vazio!");
+            return false;
+        }
+        
+        if (email == null || email.trim().isEmpty()) {
+            System.out.println("Erro: Email não pode estar vazio!");
+            return false;
+        }
+        
+        // Verificar se login já existe
+        Optional<Usuario> usuarioExistente = usuarios.stream()
+                .filter(u -> u.getLogin().equals(login))
+                .findFirst();
+        
+        if (usuarioExistente.isPresent()) {
+            System.out.println("Erro: Login já existe!");
+            return false;
+        }
+        
+        Usuario novoUsuario = null;
+        
+        switch(tipo) {
+            case "1":
+                novoUsuario = new Administrador();
+                break;
+            case "2":
+                novoUsuario = new Funcionario();
+                break;
+            case "3":
+            default:
+                novoUsuario = new UsuarioPadrao();
+                break;
+        }
+        
+        novoUsuario.setId(proximoId++);
+        novoUsuario.setNome(nome);
+        novoUsuario.setLogin(login);
+        novoUsuario.setSenha(senha);
+        novoUsuario.setEmail(email);
+        novoUsuario.setAtivo(true);
+        usuarios.add(novoUsuario);
+        System.out.println("✓ Usuário '" + nome + "' registrado com sucesso como " + novoUsuario.getClass().getSimpleName() + "!");
+        return true;
+    }
+    
+    // READ - Listar todos os usuários com seus dados
+    public void listarUsuarios() {
+        if (usuarios.isEmpty()) {
+            System.out.println("Nenhum usuário registrado no sistema.");
+            return;
+        }
+        
+        for (Usuario u : usuarios) {
+            String status = u.isAtivo() ? "✓ Ativo" : "✗ Inativo";
+            System.out.println("ID: " + u.getId() + 
+                             " | Nome: " + u.getNome() + 
+                             " | Tipo: " + u.getClass().getSimpleName() + 
+                             " | Login: " + u.getLogin() + 
+                             " | Status: " + status);
+        }
     }
 }
