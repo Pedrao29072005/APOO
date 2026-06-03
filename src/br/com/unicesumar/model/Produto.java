@@ -4,7 +4,7 @@ public class Produto {
     private int idProduto;
     private String nome;
     private String descricao;
-    private String quantidade;
+    private int quantidade;
     private double preco;
     private int estoqueMinimo;  
     private String unidade;
@@ -12,7 +12,7 @@ public class Produto {
     public Produto() {
     }
     public Produto(int idProduto, String nome, String descricao,
-                    String quantidade, Double preco,
+                    int quantidade, Double preco,
                     int estoqueMinimo, String unidade, boolean ativo) 
     {
         this.idProduto = idProduto;
