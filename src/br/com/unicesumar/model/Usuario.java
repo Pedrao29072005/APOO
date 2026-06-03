@@ -1,6 +1,6 @@
 package br.com.unicesumar.model;
 
-public class Usuario {
+public abstract class Usuario {
     private int id;
     private String nome;
     private String login;
@@ -67,4 +67,7 @@ public class Usuario {
     public void setAtivo(boolean ativo) {
         this.ativo = ativo;
     }
+    
+    // Método abstrato - polimorfismo
+    public abstract void executarAcao();
 }

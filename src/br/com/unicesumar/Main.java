@@ -5,6 +5,8 @@ import br.com.unicesumar.controller.UsuarioController;
 import br.com.unicesumar.controller.MovimentacaoController;
 import br.com.unicesumar.model.Produto;
 import br.com.unicesumar.model.Usuario;
+import br.com.unicesumar.model.Administrador;
+import br.com.unicesumar.model.Funcionario;
 
 public class Main {
     public static void main(String[] args) {
@@ -51,5 +53,28 @@ public class Main {
         
         System.out.println("\n--- Logout ---");
         usuarioCtrl.logout();
+        
+        // ===== DEMONSTRAÇÃO DE POLIMORFISMO =====
+        System.out.println("\n========== DEMONSTRAÇÃO DE POLIMORFISMO E HERANÇA ==========\n");
+        System.out.println("Conceito: Administrador e Funcionário herdam de Usuário (Herança)");
+        System.out.println("Ambos sobrescrevem executarAcao() com comportamentos diferentes (Polimorfismo)\n");
+        
+        // Criar instâncias polimórficas
+        Usuario admin = new Administrador();
+        admin.setNome("Carlos Silva");
+        
+        Usuario funcionario = new Funcionario();
+        funcionario.setNome("Ana Santos");
+        
+        // Array de usuários demonstrando polimorfismo
+        Usuario[] usuarios = { admin, funcionario };
+        
+        System.out.println("--- Executando ações (Polimorfismo em tempo de execução) ---");
+        for (Usuario u : usuarios) {
+            System.out.println("\nUsuário: " + u.getNome());
+            u.executarAcao(); // Polimorfismo: chama o método correto de cada classe
+        }
+        
+        System.out.println("\n========== FIM DO PROGRAMA ==========");
     }
 }

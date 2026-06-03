@@ -1,6 +1,7 @@
 package br.com.unicesumar.controller;
 
 import br.com.unicesumar.model.Usuario;
+import br.com.unicesumar.model.UsuarioPadrao;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -37,7 +38,13 @@ public class UsuarioController {
             return false;
         }
         
-        Usuario novoUsuario = new Usuario(proximoId++, nome, login, senha, email, true);
+        Usuario novoUsuario = new UsuarioPadrao();
+        novoUsuario.setId(proximoId++);
+        novoUsuario.setNome(nome);
+        novoUsuario.setLogin(login);
+        novoUsuario.setSenha(senha);
+        novoUsuario.setEmail(email);
+        novoUsuario.setAtivo(true);
         usuarios.add(novoUsuario);
         System.out.println("✓ Usuário '" + nome + "' registrado com sucesso!");
         return true;
