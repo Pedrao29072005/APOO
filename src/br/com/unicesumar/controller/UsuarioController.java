@@ -1,126 +1,146 @@
 package br.com.unicesumar.controller;
 
-import br.com.unicesumar.model.Produto;
+import br.com.unicesumar.model.Usuario;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
-public class ProdutoController {
-    private List<Produto> produtos;
+public class UsuarioController {
+    private List<Usuario> usuarios;
     private int proximoId = 1;
+    private Usuario usuarioLogado;
     
-    public ProdutoController() {
-        this.produtos = new ArrayList<>();
+    public UsuarioController() {
+        this.usuarios = new ArrayList<>();
+        this.usuarioLogado = null;
     }
     
-    // CREATE - Adicionar novo produto
-    public boolean adicionarProduto(String nome, String descricao, int quantidade, 
-                                    double preco, int estoqueMinimo, String unidade) {
-        if (nome == null || nome.trim().isEmpty()) {
-            System.out.println("Erro: Nome do produto não pode estar vazio!");
+    // CREATE - Registrar novo usuário
+    public boolean registrarUsuario(String nome, String login, String email, String senha) {
+        if (login == null || login.trim().isEmpty()) {
+            System.out.println("Erro: Login não pode estar vazio!");
             return false;
         }
         
-        if (preco < 0) {
-            System.out.println("Erro: Preço não pode ser negativo!");
+        if (email == null || email.trim().isEmpty()) {
+            System.out.println("Erro: Email não pode estar vazio!");
             return false;
         }
         
-        if (quantidade < 0) {
-            System.out.println("Erro: Quantidade não pode ser negativa!");
+        // Verificar se login já existe
+        Optional<Usuario> usuarioExistente = usuarios.stream()
+                .filter(u -> u.getLogin().equals(login))
+                .findFirst();
+        
+        if (usuarioExistente.isPresent()) {
+            System.out.println("Erro: Login já existe!");
             return false;
         }
         
-        Produto novoProduto = new Produto(proximoId++, nome, descricao, quantidade, 
-                                          preco, estoqueMinimo, unidade, true);
-        produtos.add(novoProduto);
-        System.out.println("✓ Produto '" + nome + "' adicionado com sucesso!");
+        Usuario novoUsuario = new Usuario(proximoId++, nome, login, senha, email, true);
+        usuarios.add(novoUsuario);
+        System.out.println("✓ Usuário '" + nome + "' registrado com sucesso!");
         return true;
     }
     
-    // READ - Buscar produto por ID
-    public Produto buscarPorId(int id) {
-        Optional<Produto> produto = produtos.stream()
-                .filter(p -> p.getIdProduto() == id)
+    // LOGIN - Autenticar usuário
+    public boolean login(String login, String senha) {
+        Optional<Usuario> usuario = usuarios.stream()
+                .filter(u -> u.getLogin().equals(login) && u.getSenha().equals(senha))
                 .findFirst();
         
-        if (produto.isPresent()) {
-            return produto.get();
+        if (usuario.isPresent()) {
+            usuarioLogado = usuario.get();
+            System.out.println("✓ Login realizado com sucesso! Bem-vindo " + usuario.get().getNome() + "!");
+            return true;
         }
-        System.out.println("Erro: Produto com ID " + id + " não encontrado!");
+        
+        System.out.println("Erro: Login ou senha inválidos!");
+        return false;
+    }
+    
+    // LOGOUT - Desconectar usuário
+    public boolean logout() {
+        if (usuarioLogado != null) {
+            System.out.println("✓ " + usuarioLogado.getNome() + " desconectado com sucesso!");
+            usuarioLogado = null;
+            return true;
+        }
+        System.out.println("Erro: Nenhum usuário logado!");
+        return false;
+    }
+    
+    // READ - Buscar usuário por ID
+    public Usuario buscarPorId(int id) {
+        Optional<Usuario> usuario = usuarios.stream()
+                .filter(u -> u.getId() == id)
+                .findFirst();
+        
+        if (usuario.isPresent()) {
+            return usuario.get();
+        }
+        System.out.println("Erro: Usuário com ID " + id + " não encontrado!");
         return null;
     }
     
-    // READ - Listar todos os produtos ativos
-    public List<Produto> listarProdutosAtivos() {
-        List<Produto> ativos = new ArrayList<>();
-        for (Produto p : produtos) {
-            if (p.isAtivo()) {
-                ativos.add(p);
+    // READ - Buscar usuário por login
+    public Usuario buscarPorLogin(String login) {
+        Optional<Usuario> usuario = usuarios.stream()
+                .filter(u -> u.getLogin().equals(login))
+                .findFirst();
+        
+        if (usuario.isPresent()) {
+            return usuario.get();
+        }
+        System.out.println("Erro: Usuário com login '" + login + "' não encontrado!");
+        return null;
+    }
+    
+    // UPDATE - Atualizar informações do usuário
+    public boolean atualizarUsuario(int id, String nome, String email) {
+        Usuario usuario = buscarPorId(id);
+        
+        if (usuario == null) {
+            return false;
+        }
+        
+        usuario.setNome(nome);
+        usuario.setEmail(email);
+        System.out.println("✓ Usuário atualizado com sucesso!");
+        return true;
+    }
+    
+    // DELETE - Desativar usuário
+    public boolean desativarUsuario(int id) {
+        Usuario usuario = buscarPorId(id);
+        
+        if (usuario == null) {
+            return false;
+        }
+        
+        usuario.setAtivo(false);
+        System.out.println("✓ Usuário desativado com sucesso!");
+        return true;
+    }
+    
+    // READ - Listar todos os usuários ativos
+    public List<Usuario> listarUsuariosAtivos() {
+        List<Usuario> ativos = new ArrayList<>();
+        for (Usuario u : usuarios) {
+            if (u.isAtivo()) {
+                ativos.add(u);
             }
         }
         return ativos;
     }
     
-    // UPDATE - Atualizar informações do produto
-    public boolean atualizarProduto(int id, String nome, String descricao, 
-                                    double preco, int estoqueMinimo) {
-        Produto produto = buscarPorId(id);
-        
-        if (produto == null) {
-            return false;
-        }
-        
-        if (preco < 0) {
-            System.out.println("Erro: Preço não pode ser negativo!");
-            return false;
-        }
-        
-        produto.setNome(nome);
-        produto.setDescricao(descricao);
-        produto.setPreco(preco);
-        produto.setEstoqueMinimo(estoqueMinimo);
-        System.out.println("✓ Produto atualizado com sucesso!");
-        return true;
-    }
-    
-    // DELETE - Desativar produto (soft delete)
-    public boolean desativarProduto(int id) {
-        Produto produto = buscarPorId(id);
-        
-        if (produto == null) {
-            return false;
-        }
-        
-        produto.setAtivo(false);
-        System.out.println("✓ Produto desativado com sucesso!");
-        return true;
-    }
-    
-    // LÓGICA DE NEGÓCIO - Verificar estoque baixo
-    public List<Produto> produtosComEstoqueBaixo() {
-        List<Produto> comEstoqueBaixo = new ArrayList<>();
-        for (Produto p : produtos) {
-            if (p.isAtivo() && p.getQuantidade() < p.getEstoqueMinimo()) {
-                comEstoqueBaixo.add(p);
-            }
-        }
-        return comEstoqueBaixo;
-    }
-    
-    // LÓGICA DE NEGÓCIO - Calcular valor total do estoque
-    public double calcularValorTotalEstoque() {
-        double total = 0;
-        for (Produto p : produtos) {
-            if (p.isAtivo()) {
-                total += p.getQuantidade() * p.getPreco();
-            }
-        }
-        return total;
-    }
-    
     // Listar todos
-    public List<Produto> listarTodos() {
-        return new ArrayList<>(produtos);
+    public List<Usuario> listarTodos() {
+        return new ArrayList<>(usuarios);
+    }
+    
+    // Verificar se há usuário logado
+    public Usuario getUsuarioLogado() {
+        return usuarioLogado;
     }
 }
